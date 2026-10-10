@@ -6,7 +6,7 @@ $bridgePath = (Join-Path $PSScriptRoot 'figma-mcp-bridge').Replace('\', '/')
 $targetRemote = 'https://github.com/StupnikovAleksandr/customization-figma-mcp-bridge.git'
 function Invoke-Git {
     param([string[]]$GitArgs)
-    & git -c "safe.directory=$workspacePath" @GitArgs
+    & git --no-pager -c "safe.directory=$workspacePath" @GitArgs
     if ($LASTEXITCODE -ne 0) { throw "Git failed: $($GitArgs -join ' ')" }
 }
 
@@ -91,5 +91,11 @@ if ($stagedPaths.Count -gt 0) {
     & git -c "safe.directory=$workspacePath" rev-parse --verify --quiet HEAD | Out-Null
     $commitMessage = if ($LASTEXITCODE -eq 0) { 'Update audit workspace and documentation' } else { 'first commit' }
     Invoke-Git -GitArgs @('commit', '-m', $commitMessage)
+}
+# Integrate remote commits before pushing; conflicts stop the script for review.
+Invoke-Git -GitArgs @('fetch', 'origin')
+& git --no-pager -c "safe.directory=$workspacePath" rev-parse --verify --quiet refs/remotes/origin/main | Out-Null
+if ($LASTEXITCODE -eq 0) {
+    Invoke-Git -GitArgs @('-c', 'core.editor=true', 'rebase', 'origin/main')
 }
 Invoke-Git -GitArgs @('push', '-u', 'origin', 'main')

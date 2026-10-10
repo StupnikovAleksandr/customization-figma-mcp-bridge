@@ -1,0 +1,1 @@
+{"name":"local-figma-browser-tools","private":true,"dependencies":{"@playwright/mcp":"0.0.83","playwright":"1.64.0"}}

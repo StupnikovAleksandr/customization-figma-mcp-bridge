@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Проверка сайта по Figma</title><style>
+:root{color-scheme:dark;--bg:#11131b;--panel:#1c1f2b;--muted:#a6aabf;--line:#363a4d;--accent:#b5a3ff}*{box-sizing:border-box}[hidden]{display:none!important}body{margin:0;background:var(--bg);color:#f4f3fa;font:15px/1.55 system-ui,sans-serif}header{padding:30px 4vw 20px;border-bottom:1px solid var(--line)}h1{font-size:28px;line-height:1.2;margin:8px 0 12px}a{color:#c7baff}.muted{color:var(--muted)}.eyebrow{font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--accent)}main{padding:24px 4vw 60px}.cards{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:0 0 24px}.card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:18px}.card strong{display:block;font-size:22px}.card span{color:var(--muted)}.issues{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:24px}.issue{padding:18px;border:1px solid #76533e;border-radius:12px;background:#28221e}.issue small{color:#ffc592}.issue h2{font-size:17px;margin:6px 0}.issue p{margin:0}.issue.low{border-color:#51496a;background:#242130}.issue.low small{color:#c7baff}.controls{display:flex;flex-wrap:wrap;gap:12px;align-items:center;margin:20px 0}select,button{font:inherit;background:var(--panel);color:inherit;border:1px solid var(--line);border-radius:7px;padding:9px 13px}select{max-width:100%}button{cursor:pointer}button[aria-pressed=true]{border-color:var(--accent);color:#d2c8ff}label{display:flex;gap:8px;align-items:center}input{accent-color:var(--accent)}.tabs{display:flex;gap:8px;flex-wrap:wrap;margin:14px 0}.tabs button{font-size:13px}.viewer{display:grid;grid-template-columns:1fr 1fr;gap:16px;align-items:start}.pane{min-width:0;background:var(--panel);border:1px solid var(--line);border-radius:10px;overflow:hidden}.caption{padding:10px 14px;border-bottom:1px solid var(--line);font-size:13px;display:flex;justify-content:space-between}.canvas{overflow:auto;max-height:78vh;background:#222}.canvas>img{display:block;width:100%;height:auto}.stack{position:relative;width:100%}.stack>img{display:block;width:100%;height:auto}.stack>img.site{position:absolute;top:0;left:0;opacity:.5}.viewer.overlay{grid-template-columns:1fr}.viewer.overlay .pane:first-child{max-width:100%}.viewer.overlay .pane:last-child{display:none}.viewer.actual .canvas>img,.viewer.actual .stack{width:var(--native-width);max-width:none}table{border-collapse:collapse;width:100%;font-size:13px}td,th{padding:10px 12px;border-bottom:1px solid var(--line);text-align:left}th{color:var(--muted);font-weight:500}td:nth-child(n+2){font-family:ui-monospace,monospace;white-space:nowrap}.table{overflow:auto;margin-top:18px;background:var(--panel);border:1px solid var(--line);border-radius:10px}.diff{color:#ffc592}h2{font-size:20px;margin-top:28px}.note{font-size:13px;color:var(--muted);max-width:1000px}.links{display:flex;gap:18px;flex-wrap:wrap}.pill{font-size:12px;border:1px solid var(--line);border-radius:20px;padding:3px 9px;color:#c8d5b1}footer{padding-top:24px;color:var(--muted);font-size:12px}@media(max-width:700px){.cards,.issues,.viewer{grid-template-columns:1fr}.cards{gap:8px}.card strong{font-size:18px}h1{font-size:24px}.controls{align-items:flex-start}}
+</style></head><body><header><div class="eyebrow">Figma → сайт</div><h1 id="reportTitle">Проверка сайта по Figma</h1><p class="muted">Допуск: до 3 CSS px включительно. Данные и PNG добавляются при аудите.</p><div class="links"><a href="REPORT.md">Полный отчёт</a><a href="measurements.json">Измерения JSON</a></div></header><main><div class="issues" id="issues"></div><div class="controls"><label for="case">Макет <select id="case"></select></label><button id="mode" aria-pressed="false">Наложение</button><button id="size" aria-pressed="false">Масштаб 1:1</button><label id="opacityLabel" hidden>Сайт <input id="opacity" type="range" min="0" max="100" value="50" aria-label="Непрозрачность сайта"><output id="opacityValue">50%</output></label></div><div class="tabs" id="tabs" aria-label="Быстрый выбор адаптива"></div><p id="caseNote" class="note"></p><div class="viewer" id="viewer"><section class="pane"><div class="caption"><span id="firstLabel">Figma</span><a id="figmaLink" target="_blank">Открыть PNG ↗</a></div><div class="canvas"><img id="figmaImage" alt=""><div class="stack" id="stack" hidden><img id="baseImage" alt=""><img id="topImage" class="site" alt=""></div></div></section><section class="pane"><div class="caption"><span>Сайт</span><a id="siteLink" target="_blank">Открыть PNG ↗</a></div><div class="canvas"><img id="siteImage" alt=""></div></section></div>
+<h2>Опорные размеры и координаты</h2><p class="note">x / y — от левого верхнего угла фрейма; w / h — ширина и высота. Дельта = сайт − макет. Числа округлены до 0,01 px. Разница до 3 CSS px включительно — в пределах допуска и не считается ошибкой.</p><div class="table"><table><thead><tr><th>Элемент</th><th>Figma, px</th><th>Сайт, px</th><th>Δ, px</th></tr></thead><tbody id="rows"></tbody></table></div><footer>Проверка выбранных адаптивов и состояний. Укажите дату, браузер, ограничения проверки и подтверждённые наблюдения в REPORT.md.</footer></main>
+<script>
+// Replace this object with audit data. All numeric measurements are raw CSS pixels.
+// Each case: {id,name,width,height,state,note,figmaImage,siteImage,rows:[{name,figma:{x,y,w,h},site:{x,y,w,h}}]}.
+const report = {title:"Проверка сайта по Figma",summary:"Шаблон: добавьте результаты аудита.",issues:[],cases:[]};
+const $ = id => document.getElementById(id);
+const cases = report.cases;
+const select = $("case");
+let overlay = false;
+$("reportTitle").textContent = report.title;
+const summary = document.createElement("p");
+summary.className = "note"; summary.textContent = report.summary;
+$("issues").before(summary);
+for (const issue of report.issues) {
+  const card=document.createElement("article");card.className="issue";
+  for (const [tag,value] of [["small",issue.severity],["h2",issue.title],["p",issue.description]]) {
+    const el=document.createElement(tag);el.textContent=value || "";card.append(el);
+  }
+  $("issues").append(card);
+}
+cases.forEach((c,i)=>{
+  const label=c.width+" × "+c.height+" · "+(c.state || c.name || c.id);
+  const o=document.createElement("option");o.value=i;o.textContent=label;select.append(o);
+  const b=document.createElement("button");b.textContent=label;
+  b.onclick=()=>{select.value=i;render()};$("tabs").append(b);
+});
+const fmt = obj => Object.entries(obj).map(([k,v])=>k+": "+Number(v.toFixed(2))).join(" · ");
+function render(){
+  const c=cases[Number(select.value)];
+  if (!c) {
+    $("caseNote").textContent="В шаблоне ещё нет снимков. Заполните report.cases результатами проверки.";
+    $("viewer").hidden=true;
+    for(const id of ["case","mode","size","opacity"]) $(id).disabled=true;
+    return;
+  }
+  document.documentElement.style.setProperty("--native-width",c.width+"px");
+  $("figmaImage").src=$("baseImage").src=c.figmaImage;
+  $("siteImage").src=$("topImage").src=c.siteImage;
+  $("figmaImage").alt=$("baseImage").alt="Figma "+c.id;
+  $("siteImage").alt=$("topImage").alt="Сайт "+c.width+" px";
+  $("figmaLink").href=c.figmaImage;$("siteLink").href=c.siteImage;
+  $("caseNote").textContent=[c.name,c.id,c.width+" × "+c.height,c.state,c.note].filter(Boolean).join(" · ");
+  $("rows").replaceChildren();
+  for(const row of c.rows || []){
+    const delta={};
+    for(const key of Object.keys(row.figma))
+      if(typeof row.figma[key]==="number" && typeof row.site[key]==="number") delta[key]=row.site[key]-row.figma[key];
+    const tr=document.createElement("tr");
+    [row.name,fmt(row.figma),fmt(row.site),fmt(delta)].forEach((value,i)=>{
+      const td=document.createElement("td");td.textContent=value;
+      if(i===3){
+        const exceeds=Object.values(delta).some(value=>Math.abs(value)>3);
+        td.className=exceeds?"diff":"";
+        td.title=exceeds?"Превышает допуск: проверить сопоставимость":"В пределах допуска";
+      }
+      tr.append(td);
+    });
+    $("rows").append(tr);
+  }
+  [...$("tabs").children].forEach((b,i)=>b.setAttribute("aria-pressed",String(i===Number(select.value))));
+}
+select.onchange=render;
+$("mode").onclick=()=>{
+  overlay=!overlay;$("viewer").classList.toggle("overlay",overlay);
+  $("mode").setAttribute("aria-pressed",String(overlay));
+  $("figmaImage").hidden=overlay;$("stack").hidden=!overlay;
+  $("opacityLabel").hidden=!overlay;$("firstLabel").textContent=overlay?"Figma + сайт":"Figma";
+};
+$("size").onclick=()=>{
+  const active=$("viewer").classList.toggle("actual");
+  $("size").setAttribute("aria-pressed",String(active));
+};
+$("opacity").oninput=()=>{
+  $("topImage").style.opacity=$("opacity").value/100;
+  $("opacityValue").value=$("opacity").value+"%";
+};
+render();
+</script></body></html>

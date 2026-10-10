@@ -1,5 +1,14 @@
 # customization-figma-mcp-bridge
 
+[![Codex](https://img.shields.io/badge/Codex-MCP-111827?style=for-the-badge)](https://github.com/StupnikovAleksandr/customization-figma-mcp-bridge)
+[![Figma](https://img.shields.io/badge/Figma-Bridge-F24E1E?style=for-the-badge&logo=figma&logoColor=white)](https://github.com/gethopp/figma-mcp-bridge)
+[![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?style=for-the-badge&logo=typescript&logoColor=white)](figma-mcp-bridge/server/package.json)
+[![Node.js](https://img.shields.io/badge/Node.js-20%2B-339933?style=for-the-badge&logo=nodedotjs&logoColor=white)](figma-mcp-bridge/server/package.json)
+[![Playwright](https://img.shields.io/badge/Playwright-2EAD33?style=for-the-badge)](browser-tools/package.json)
+[![License: MIT (Bridge)](https://img.shields.io/badge/Bridge_License-MIT-blue?style=for-the-badge)](figma-mcp-bridge/LICENSE.md)
+
+**Подключает Codex к Figma через MCP для проверки сайтов по макетам на всех адаптивах и создания наглядных HTML-отчётов.**
+
 Локальное окружение для проверки сайтов по макетам Figma с помощью Codex, Figma MCP Bridge и Playwright. Цель — проверять все адаптивы и состояния из макетов, находить подтверждённые расхождения и сохранять понятный HTML-отчёт с изображениями и измерениями.
 
 Основа — [Figma MCP Bridge от gethopp](https://github.com/gethopp/figma-mcp-bridge), исходники в `figma-mcp-bridge/`. Сохранены авторство и [лицензия MIT](figma-mcp-bridge/LICENSE.md). Предыдущий форк: [StupnikovAleksandr/figma-mcp-bridge](https://github.com/StupnikovAleksandr/figma-mcp-bridge). Этот проект: [customization-figma-mcp-bridge](https://github.com/StupnikovAleksandr/customization-figma-mcp-bridge).
@@ -55,4 +64,12 @@ powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\setup-figma.ps1
 
 
 
-Скрипт создаёт Git-репозиторий при необходимости, выбирает main, настраивает указанный выше origin, добавляет исходники и документацию, проверяет исключения, создаёт первый коммит `first commit` и выполняет `git push -u origin main`. Вложенный checkout Bridge добавляется обычными исходниками, без gitlink. Существующий origin другого проекта не перезаписывается; force push не используется. Нужны настроенные имя/email Git и авторизация GitHub. Скрипт не обходит ограничения среды: запускай его там, где разрешена запись в `.git`.
+## Публикация проекта
+
+Из корня проекта выполни:
+
+```powershell
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\publish.ps1
+```
+
+Скрипт создаёт Git-репозиторий при необходимости, выбирает main, настраивает указанный выше origin, добавляет исходники и документацию, проверяет исключения и полноту исходников сервера и плагина, создаёт первый коммит `first commit` и выполняет `git push -u origin main`. Вложенный checkout Bridge добавляется обычными исходниками, без gitlink. При отсутствии обязательных файлов в индексе публикация останавливается. Перед push скрипт получает изменения с origin и выполняет rebase; при конфликте нужно объединить файлы и продолжить rebase. Существующий origin другого проекта не перезаписывается; force push не используется. Нужны настроенные имя/email Git и авторизация GitHub. Скрипт не обходит ограничения среды: запускай его там, где разрешена запись в `.git`.

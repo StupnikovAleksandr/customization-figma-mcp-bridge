@@ -28,4 +28,3 @@ tmp/
 *.tsbuildinfo
 Thumbs.db
 .DS_Store
-figma-mcp-bridge/.git/
